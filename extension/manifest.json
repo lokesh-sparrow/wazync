@@ -2,7 +2,7 @@
   "manifest_version": "0.3",
   "name": "wazync",
   "display_name": "Wazync",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Save documents shared in WhatsApp groups into your folders, on request. Read and save only: it cannot send messages or files.",
   "author": {
     "name": "lokesh-sparrow",

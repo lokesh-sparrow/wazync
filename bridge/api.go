@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"crypto/subtle"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -43,7 +44,7 @@ func boolParam(r *http.Request, name string) bool {
 	return v
 }
 
-func serveAPI(listener net.Listener, b *Bridge) {
+func serveAPI(listener net.Listener, b *Bridge, token string) {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("GET /api/status", func(w http.ResponseWriter, r *http.Request) {
@@ -221,7 +222,16 @@ func serveAPI(listener net.Listener, b *Bridge) {
 		}()
 	})
 
-	srv := &http.Server{Handler: mux, ReadHeaderTimeout: 10 * time.Second}
+	// Every request must carry the secret key from the connection file.
+	want := []byte("Bearer " + token)
+	guarded := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if subtle.ConstantTimeCompare([]byte(r.Header.Get("Authorization")), want) != 1 {
+			fail(w, 401, "missing or wrong key")
+			return
+		}
+		mux.ServeHTTP(w, r)
+	})
+	srv := &http.Server{Handler: guarded, ReadHeaderTimeout: 10 * time.Second}
 	srv.Serve(listener)
 }
 

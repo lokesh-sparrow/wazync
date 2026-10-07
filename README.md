@@ -18,7 +18,7 @@ number: there is no sending code in it.
 You need Windows, [Claude Desktop](https://claude.ai/download) and your phone with
 WhatsApp.
 
-1. Download `wazync-1.0.0.mcpb` from the
+1. Download `wazync-1.0.1.mcpb` from the
    [latest release](https://github.com/lokesh-sparrow/wazync/releases/latest).
 2. Drag it into Claude Desktop (or double-click it) and choose **Install**.
 3. In a new chat, ask **"link my WhatsApp"**. A QR code appears in the chat. On
@@ -74,16 +74,24 @@ record of your chats as messages arrive.
   Settings → Extensions → Wazync.
 - Your WhatsApp link, the message record and the list of saved files are kept in
   `%LOCALAPPDATA%\Wazync`.
-- The bridge only accepts connections from your own computer (127.0.0.1).
+- The bridge only accepts connections from your own computer (127.0.0.1), and only
+  from the Wazync extension: each time it starts it creates a new secret key that
+  only your Windows account can read, and it refuses every request without that key.
+  Other people signed in to the same computer cannot read your messages through it.
 
 ## Privacy and safety
 
 - **No sending.** Wazync has no code that sends messages, files, reactions or read
   receipts.
+- **Stored on your computer.** Messages are kept readable in `%LOCALAPPDATA%\Wazync`,
+  like WhatsApp Desktop's own data, protected by Windows so only your account (and
+  the computer's administrators) can open it. Turn on BitLocker for full-disk
+  encryption.
 - **Local only.** Wazync itself sends nothing anywhere except its connection to
   WhatsApp. What Claude reads through the tools becomes part of your Claude
   conversation, like anything else you share with Claude. Other computers on your
-  network cannot reach the bridge.
+  network cannot reach the bridge, and other users of the same computer are refused
+  without the secret key.
 - **Quiet logs.** The bridge log records connection events and that a file arrived,
   not message text.
 - **Messages are data.** Claude is told to treat message text, captions and file
@@ -110,7 +118,7 @@ cd wazync
 .\build.ps1
 ```
 
-This creates `dist\wazync-1.0.0.mcpb`, ready to install as above.
+This creates `dist\wazync-1.0.1.mcpb`, ready to install as above.
 
 ## Credits
 

@@ -4,7 +4,10 @@ package main
 
 import (
 	"context"
+	"crypto/rand"
 	"database/sql"
+	"encoding/hex"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"net"
@@ -27,7 +30,21 @@ import (
 // version is set at build time with -ldflags "-X main.version=..."
 var version = "dev"
 
-const defaultPort = 47823
+// connectionFile tells the extension where the bridge listens and which key to send.
+const connectionFile = "bridge.json"
+
+func writeConnectionFile(port int) (string, error) {
+	key := make([]byte, 32)
+	if _, err := rand.Read(key); err != nil {
+		return "", err
+	}
+	token := hex.EncodeToString(key)
+	data, _ := json.Marshal(map[string]interface{}{"version": version, "port": port, "token": token, "pid": os.Getpid()})
+	if err := os.WriteFile(connectionFile+".tmp", data, 0600); err != nil {
+		return "", err
+	}
+	return token, os.Rename(connectionFile+".tmp", connectionFile)
+}
 
 var (
 	startedAt     = time.Now()
@@ -52,7 +69,7 @@ func formatTime(t time.Time) string {
 
 func main() {
 	dataDir := flag.String("data", filepath.Join(os.Getenv("LOCALAPPDATA"), "Wazync"), "folder for the WhatsApp link, message record and log")
-	port := flag.Int("port", defaultPort, "local port for the Wazync extension")
+	port := flag.Int("port", 0, "local port for the Wazync extension; 0 picks a free one")
 	extensionDir := flag.String("extension-dir", "", "folder of the installed Claude extension; the bridge stops when it is removed")
 	autostart := flag.String("autostart", "", "\"true\" or \"false\": start the bridge when you sign in to Windows")
 	flag.Parse()
@@ -61,25 +78,37 @@ func main() {
 		os.Exit(1)
 	}
 	os.Chdir(*dataDir)
-	if f, err := os.Create("bridge.log"); err == nil {
-		os.Stdout, os.Stderr = f, f
-	}
 
 	// Uninstalled extension: remove our sign-in entry and stop.
 	if *extensionDir != "" {
 		if _, err := os.Stat(*extensionDir); os.IsNotExist(err) {
 			setAutostart(false, "")
-			fmt.Println("Wazync extension removed; bridge stopped and sign-in start removed.")
 			return
 		}
 	}
 
-	// One bridge at a time: holding the port is the lock.
-	listener, err := net.Listen("tcp", fmt.Sprintf("127.0.0.1:%d", *port))
-	if err != nil {
-		fmt.Println("Another Wazync bridge is already running.")
+	// One bridge per Windows user.
+	if err := lockInstance("bridge.lock"); err != nil {
 		return
 	}
+	if f, err := os.Create("bridge.log"); err == nil {
+		os.Stdout, os.Stderr = f, f
+	}
+
+	// A free local port of our own, so several users on one computer never clash.
+	listener, err := net.Listen("tcp", fmt.Sprintf("127.0.0.1:%d", *port))
+	if err != nil {
+		fmt.Printf("Cannot open the local port: %v\n", err)
+		return
+	}
+	// A new secret key every start. Only this Windows user can read the file, and
+	// the bridge refuses every request that does not carry the key.
+	token, err := writeConnectionFile(listener.Addr().(*net.TCPAddr).Port)
+	if err != nil {
+		fmt.Printf("Cannot write the connection file: %v\n", err)
+		return
+	}
+	defer os.Remove(connectionFile)
 
 	installedFrom = *extensionDir
 	if *autostart != "" {
@@ -128,7 +157,7 @@ func main() {
 		}
 	})
 
-	go serveAPI(listener, b)
+	go serveAPI(listener, b, token)
 
 	if client.Store.ID == nil {
 		b.StartPairing()
