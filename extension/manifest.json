@@ -1,0 +1,54 @@
+{
+  "manifest_version": "0.3",
+  "name": "wazync",
+  "display_name": "Wazync",
+  "version": "1.0.0",
+  "description": "Save documents shared in WhatsApp groups into your folders, on request. Read and save only: it cannot send messages or files.",
+  "author": {
+    "name": "lokesh-sparrow",
+    "url": "https://github.com/lokesh-sparrow"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lokesh-sparrow/wazync"
+  },
+  "homepage": "https://github.com/lokesh-sparrow/wazync#readme",
+  "support": "https://github.com/lokesh-sparrow/wazync/issues",
+  "license": "MIT",
+  "icon": "icon.png",
+  "user_config": {
+    "start_with_windows": {
+      "type": "boolean",
+      "title": "Start with Windows",
+      "description": "Keep receiving WhatsApp messages after you sign in to Windows, even when Claude Desktop is closed.",
+      "default": true
+    }
+  },
+  "server": {
+    "type": "node",
+    "entry_point": "server/index.js",
+    "mcp_config": {
+      "command": "node",
+      "args": ["${__dirname}/server/index.js"],
+      "env": {
+        "WAZYNC_START_WITH_WINDOWS": "${user_config.start_with_windows}"
+      }
+    }
+  },
+  "tools": [
+    {"name": "get_status", "description": "Check that WhatsApp is linked, connected and receiving messages"},
+    {"name": "link_whatsapp", "description": "Show a QR code to link WhatsApp from your phone"},
+    {"name": "list_chats", "description": "Find chats and groups by name"},
+    {"name": "list_messages", "description": "Read messages filtered by chat, sender, text or date"},
+    {"name": "get_message_context", "description": "Show the messages around one message"},
+    {"name": "search_contacts", "description": "Find people by name or number"},
+    {"name": "list_media", "description": "List shared files with name, sender and whether already saved"},
+    {"name": "save_media", "description": "Save a shared file into a folder, never overwriting or saving twice"},
+    {"name": "rename_saved_file", "description": "Rename a file Wazync saved, never overwriting"}
+  ],
+  "tools_generated": false,
+  "keywords": ["whatsapp", "documents", "files", "mcp"],
+  "compatibility": {
+    "platforms": ["win32"]
+  }
+}

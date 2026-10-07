@@ -1,0 +1,14 @@
+# Bridge data: WhatsApp link, messages, QR codes
+store/
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+qr.png
+
+# Logs can contain chat activity
+*.log
+
+# Builds
+*.exe
+dist/
