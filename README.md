@@ -18,7 +18,7 @@ number: there is no sending code in it.
 You need Windows, [Claude Desktop](https://claude.ai/download) and your phone with
 WhatsApp.
 
-1. Download `wazync-1.0.1.mcpb` from the
+1. Download `wazync-1.0.2.mcpb` from the
    [latest release](https://github.com/lokesh-sparrow/wazync/releases/latest).
 2. Drag it into Claude Desktop (or double-click it) and choose **Install**.
 3. In a new chat, ask **"link my WhatsApp"**. A QR code appears in the chat. On
@@ -42,11 +42,28 @@ saves the same file to the same folder twice.
 
 ### File names
 
-Each saved file gets a short name taken from the document itself:
-`<issuer>-<date>-<party>`, for example `ADCB-06.10.26-John Smith.pdf`. The date is
-the document's own date, legal suffixes such as LLC are dropped, amounts are left
-out, and a second file with the same issuer, date and party becomes `-1`, `-2` and
-so on. Names stay well within Windows' 260-character path limit.
+Each saved file gets a short name taken from what the document itself says: the
+type of document, the date that matters for it, and who it is from or for.
+
+| Document | Example name |
+| --- | --- |
+| Bank payment or transfer | `Bank Payment-2026-Oct-06-John Smith.pdf` |
+| Bank statement | `Bank Statement-2026-Sep.pdf` |
+| Invoice (VAT, GST, sales tax) | `Invoice-2026-Oct-05-ACME Trading.pdf` |
+| Receipt, quotation, purchase order, contract | `Receipt-2026-Oct-04-John Smith.jpg` |
+| Utility or phone bill | `Power Bill-2026-Sep.pdf` |
+| Passport, ID card or licence | `Passport-John Smith-exp 2031-Mar-12.pdf` |
+
+- Dates are written the same way everywhere, as year, month and day, such as
+  `2026-Oct-06`, so they can't be misread in any country.
+- The bank, company or person is named as printed, without legal suffixes such as
+  LLC, Ltd, Pvt Ltd, Inc or GmbH. Amounts are left out.
+- A second file with the same name gets `-1`, then `-2`, and so on.
+- Names stay well within Windows' 260-character path limit.
+
+**My naming rules:** in Claude Desktop → Settings → Extensions → Wazync you can add
+your own rules, such as "add invoice numbers to invoices" or "skip images sent by
+my own team". They apply on top of the built-in ones.
 
 ### Tools
 
@@ -73,7 +90,7 @@ record of your chats as messages arrive.
   in, so messages keep arriving while Claude Desktop is closed. Turn it off in
   Settings → Extensions → Wazync.
 - Your WhatsApp link, the message record and the list of saved files are kept in
-  `%LOCALAPPDATA%\Wazync`.
+  `%USERPROFILE%\.wazync`.
 - The bridge only accepts connections from your own computer (127.0.0.1), and only
   from the Wazync extension: each time it starts it creates a new secret key that
   only your Windows account can read, and it refuses every request without that key.
@@ -83,7 +100,7 @@ record of your chats as messages arrive.
 
 - **No sending.** Wazync has no code that sends messages, files, reactions or read
   receipts.
-- **Stored on your computer.** Messages are kept readable in `%LOCALAPPDATA%\Wazync`,
+- **Stored on your computer.** Messages are kept readable in `%USERPROFILE%\.wazync`,
   like WhatsApp Desktop's own data, protected by Windows so only your account (and
   the computer's administrators) can open it. Turn on BitLocker for full-disk
   encryption.
@@ -106,7 +123,7 @@ record of your chats as messages arrive.
 - If you remove the linked device from your phone, ask "link my WhatsApp" again.
 - **Uninstall:** remove Wazync in Claude Desktop → Settings → Extensions. The
   bridge stops at your next sign-in and removes its own start entry. To remove your
-  data as well, delete the `%LOCALAPPDATA%\Wazync` folder.
+  data as well, delete the `%USERPROFILE%\.wazync` folder.
 
 ## Build from source
 
@@ -118,7 +135,7 @@ cd wazync
 .\build.ps1
 ```
 
-This creates `dist\wazync-1.0.1.mcpb`, ready to install as above.
+This creates `dist\wazync-1.0.2.mcpb`, ready to install as above.
 
 ## Credits
 

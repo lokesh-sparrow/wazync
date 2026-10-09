@@ -11,3 +11,8 @@ func setAutostart(enable bool, args string) error {
 func lockInstance(path string) error {
 	return nil
 }
+
+// autostartEnabled is only supported on Windows.
+func autostartEnabled() bool {
+	return false
+}

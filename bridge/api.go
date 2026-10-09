@@ -54,6 +54,7 @@ func serveAPI(listener net.Listener, b *Bridge, token string) {
 		writeJSON(w, 200, map[string]interface{}{
 			"version":              version,
 			"linked":               b.client.Store.ID != nil,
+			"start_with_windows":   autostartEnabled(),
 			"connected":            b.client.IsConnected(),
 			"linking_in_progress":  pairing,
 			"bridge_started_at":    formatTime(startedAt),
@@ -166,7 +167,7 @@ func serveAPI(listener net.Listener, b *Bridge, token string) {
 			fail(w, 400, "path and new_name are required")
 			return
 		}
-		// Keep the original extension; names like "ADCB-06.10.26-Party" contain dots of their own
+		// Keep the original extension; names like "Receipt-2026-Oct-06-J. Smith" can contain dots of their own
 		name := safeName(req.NewName)
 		if ext := filepath.Ext(req.Path); ext != "" && !strings.HasSuffix(strings.ToLower(name), strings.ToLower(ext)) {
 			name += ext

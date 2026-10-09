@@ -34,6 +34,17 @@ func setAutostart(enable bool, args string) error {
 	return key.SetStringValue(runValue, fmt.Sprintf("\"%s\" %s", exe, args))
 }
 
+// autostartEnabled reports whether the sign-in entry exists, as Windows itself sees it.
+func autostartEnabled() bool {
+	key, err := registry.OpenKey(registry.CURRENT_USER, runKey, registry.QUERY_VALUE)
+	if err != nil {
+		return false
+	}
+	defer key.Close()
+	_, _, err = key.GetStringValue(runValue)
+	return err == nil
+}
+
 // lockInstance makes sure only one bridge runs per Windows user. The lock is
 // released when the process exits.
 func lockInstance(path string) error {

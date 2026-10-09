@@ -14,6 +14,7 @@ import (
 	"os"
 	"os/signal"
 	"path/filepath"
+	"strings"
 	"sync"
 	"syscall"
 	"time"
@@ -60,6 +61,38 @@ func init() {
 	sql.Register("sqlite3", &sqlite.Driver{})
 }
 
+// defaultDataDir is %USERPROFILE%\.wazync. It is deliberately outside AppData:
+// the Microsoft Store edition of Claude Desktop redirects its extensions' AppData
+// into a private folder that the bridge, which runs outside the app, cannot see.
+func defaultDataDir() string {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		home = os.Getenv("USERPROFILE")
+	}
+	return filepath.Join(home, ".wazync")
+}
+
+// extensionInstalled checks the extension folder where Claude Desktop shows it and,
+// for the Microsoft Store edition, where Windows really keeps it
+// (%LOCALAPPDATA%\Packages\<app>\LocalCache\Roaming\...).
+func extensionInstalled(dir string) bool {
+	if _, err := os.Stat(dir); err == nil {
+		return true
+	}
+	roaming := os.Getenv("APPDATA")
+	rel, err := filepath.Rel(roaming, dir)
+	if roaming == "" || err != nil || strings.HasPrefix(rel, "..") {
+		return false
+	}
+	packages, _ := filepath.Glob(filepath.Join(os.Getenv("LOCALAPPDATA"), "Packages", "*", "LocalCache", "Roaming"))
+	for _, p := range packages {
+		if _, err := os.Stat(filepath.Join(p, rel)); err == nil {
+			return true
+		}
+	}
+	return false
+}
+
 func formatTime(t time.Time) string {
 	if t.IsZero() {
 		return ""
@@ -68,7 +101,7 @@ func formatTime(t time.Time) string {
 }
 
 func main() {
-	dataDir := flag.String("data", filepath.Join(os.Getenv("LOCALAPPDATA"), "Wazync"), "folder for the WhatsApp link, message record and log")
+	dataDir := flag.String("data", defaultDataDir(), "folder for the WhatsApp link, message record and log")
 	port := flag.Int("port", 0, "local port for the Wazync extension; 0 picks a free one")
 	extensionDir := flag.String("extension-dir", "", "folder of the installed Claude extension; the bridge stops when it is removed")
 	autostart := flag.String("autostart", "", "\"true\" or \"false\": start the bridge when you sign in to Windows")
@@ -80,11 +113,9 @@ func main() {
 	os.Chdir(*dataDir)
 
 	// Uninstalled extension: remove our sign-in entry and stop.
-	if *extensionDir != "" {
-		if _, err := os.Stat(*extensionDir); os.IsNotExist(err) {
-			setAutostart(false, "")
-			return
-		}
+	if *extensionDir != "" && !extensionInstalled(*extensionDir) {
+		setAutostart(false, "")
+		return
 	}
 
 	// One bridge per Windows user.
