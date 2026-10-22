@@ -30,17 +30,22 @@ Saving documents (for example "get today's ACME documents to D:\\Clients\\ACME")
 3. Find the group with list_chats. Exactly one match: use it. Several or none: show the candidates and ask.
 4. list_media for the period asked, with only_unsaved true, all media types unless the user asked for documents only. Page until a page is shorter than the limit. If nothing is new, say so and mention files from that period already saved (already_saved_to).
 5. save_media each file into the folder. It returns the document's text (PDF) or the image itself.
-6. Name each file from what the document itself says, then rename_saved_file. Pattern: document type, then the date that matters for that type, then the party.
+6. Name each file from what the document itself says, then rename_saved_file. Use the installed rules below, never an older naming rule remembered from elsewhere.
+   A date belongs in a name only when the same party sends that kind of document again and again:
    - Bank payment or transfer: <Bank> Payment-<date>-<beneficiary>      e.g. Bank Payment-2026-Oct-06-John Smith
    - Bank receipt or credit:   <Bank> Receipt-<date>-<payer>
    - Bank statement:           <Bank> Statement-<month>                 e.g. Bank Statement-2026-Sep
    - Invoice (VAT, GST, sales tax): Invoice-<date>-<supplier>; a sales invoice the user issued: Sales Invoice-<date>-<customer>
-   - Credit note, debit note, receipt, quotation, purchase order, contract: <Type>-<date>-<party>
+   - Credit note, debit note, receipt, quotation, purchase order: <Type>-<date>-<party>
    - Utility or phone bill:    <Provider> Bill-<month>
-   - ID or licence (passport, national ID, business licence and similar): <Document>-<name>-exp <expiry date>
-   - Anything else: <what it is>-<date>-<party>
+   Identity and permanent documents get no date, only what the document is and whose it is:
+   - Visa, passport, national ID, residence permit, driving licence: <Document>-<person>   e.g. Visa-John Smith, Passport-John Smith
+   - Business licence, registration or tax certificate, memorandum, power of attorney: <Document>-<company>   e.g. Trade Licence-ACME Trading
+   - Contract or agreement: <Type>-<party>   e.g. Tenancy Contract-ACME Trading
+   - Translation, attestation, educational or personal certificate: <Document>-<person>   e.g. Translation Certificate-John Smith, Attested Transcript-John Smith
+   - Anything else: <what it is>-<party>, adding a date only if the same party sends such documents repeatedly.
    Rules for every name:
-   - Dates always as YYYY-Mon-DD with the English three-letter month, e.g. 2026-Oct-06; a month alone as 2026-Sep. Use the document's own date, never the WhatsApp time.
+   - Dates, where used, always as YYYY-Mon-DD with the English three-letter month, e.g. 2026-Oct-06; a month alone as 2026-Sep. Use the document's own date, never the WhatsApp time.
    - The bank, provider or party as printed, in short form, without legal suffixes such as LLC, L.L.C, Ltd, Pvt Ltd, Inc, GmbH, FZE.
    - No amounts, times or reference numbers. About 60 characters at most.
    - The same name again: add -1, -2 in the order of the document's time.

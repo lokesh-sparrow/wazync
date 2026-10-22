@@ -18,7 +18,7 @@ number: there is no sending code in it.
 You need Windows, [Claude Desktop](https://claude.ai/download) and your phone with
 WhatsApp.
 
-1. Download `wazync-1.0.2.mcpb` from the
+1. Download `wazync-1.0.3.mcpb` from the
    [latest release](https://github.com/lokesh-sparrow/wazync/releases/latest).
 2. Drag it into Claude Desktop (or double-click it) and choose **Install**.
 3. In a new chat, ask **"link my WhatsApp"**. A QR code appears in the chat. On
@@ -42,19 +42,23 @@ saves the same file to the same folder twice.
 
 ### File names
 
-Each saved file gets a short name taken from what the document itself says: the
-type of document, the date that matters for it, and who it is from or for.
+Each saved file gets a short name taken from what the document itself says: what
+the document is and who it is from or for. A date is added only for documents the
+same party sends again and again, such as payments, invoices and statements.
 
 | Document | Example name |
 | --- | --- |
 | Bank payment or transfer | `Bank Payment-2026-Oct-06-John Smith.pdf` |
 | Bank statement | `Bank Statement-2026-Sep.pdf` |
 | Invoice (VAT, GST, sales tax) | `Invoice-2026-Oct-05-ACME Trading.pdf` |
-| Receipt, quotation, purchase order, contract | `Receipt-2026-Oct-04-John Smith.jpg` |
+| Receipt, quotation, purchase order | `Receipt-2026-Oct-04-John Smith.jpg` |
 | Utility or phone bill | `Power Bill-2026-Sep.pdf` |
-| Passport, ID card or licence | `Passport-John Smith-exp 2031-Mar-12.pdf` |
+| Visa, passport, ID card | `Visa-John Smith.pdf` |
+| Business licence or certificate | `Trade Licence-ACME Trading.pdf` |
+| Contract or agreement | `Tenancy Contract-ACME Trading.pdf` |
+| Translation or attested certificate | `Translation Certificate-John Smith.pdf` |
 
-- Dates are written the same way everywhere, as year, month and day, such as
+- Where a date is used, it is written the same way everywhere, as year, month and day, such as
   `2026-Oct-06`, so they can't be misread in any country.
 - The bank, company or person is named as printed, without legal suffixes such as
   LLC, Ltd, Pvt Ltd, Inc or GmbH. Amounts are left out.
@@ -135,7 +139,7 @@ cd wazync
 .\build.ps1
 ```
 
-This creates `dist\wazync-1.0.2.mcpb`, ready to install as above.
+This creates `dist\wazync-1.0.3.mcpb`, ready to install as above.
 
 ## Credits
 
