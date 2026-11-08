@@ -4,6 +4,21 @@
 
 # Wazync
 
+<div align="center">
+
+[![Latest release](https://img.shields.io/github/v/release/lokesh-sparrow/wazync?sort=semver&style=for-the-badge&label=release&labelColor=0d1117&color=22d3ee)](https://github.com/lokesh-sparrow/wazync/releases/latest)
+[![Downloads](https://img.shields.io/github/downloads/lokesh-sparrow/wazync/total?style=for-the-badge&labelColor=0d1117&color=0ea5e9)](https://github.com/lokesh-sparrow/wazync/releases)
+[![For Claude Desktop](https://img.shields.io/badge/for-Claude%20Desktop-2563eb?style=for-the-badge&labelColor=0d1117)](#install)
+[![License](https://img.shields.io/github/license/lokesh-sparrow/wazync?style=for-the-badge&labelColor=0d1117&color=6e7681)](LICENSE)
+
+<br/>
+
+<a href="https://github.com/lokesh-sparrow/wazync/releases/latest"><img src="assets/install-button.svg" alt="Install in Claude Desktop" height="55"/></a>
+
+<sub>Claude Desktop extension for Windows · read and save only, no sending code</sub>
+
+</div>
+
 Save documents shared in WhatsApp groups into your own folders, by asking Claude.
 
 Ask *"get today's ACME documents to D:\Clients\ACME\October"* and Claude checks the
